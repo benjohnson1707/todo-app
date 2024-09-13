@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -23,6 +24,16 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const timers = tasks.filter(task => task.completed).map(task => 
+      setTimeout(() => {
+        setTasks(prevTasks => prevTasks.filter(t => t.id !== task.id));
+      }, 3000)
+    );
+
+    return () => timers.forEach(timer => clearTimeout(timer));
+  }, [tasks]);
+
   return (
     <div className="todo-app">
       <h1>To-Do List</h1>
@@ -38,15 +49,13 @@ function App() {
       </div>
       <ul className="task-list">
         {tasks.map(task => (
-          <li key={task.id}>
+          <li key={task.id} className={task.completed ? 'completed' : ''}>
             <input
               type="checkbox"
               checked={task.completed}
               onChange={() => toggleTask(task.id)}
             />
-            <span style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-              {task.text}
-            </span>
+            <span>{task.text}</span>
           </li>
         ))}
       </ul>
